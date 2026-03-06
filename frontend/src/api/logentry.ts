@@ -12,9 +12,9 @@ export interface CreateLogEntryData {
 }
 
 
-export const createLogEntry = async (entryData: { mood: number; note?: string; fields?: Record<string, any> }) => {
+export const createLogEntry = async (data: CreateLogEntryData) => {
     try {
-        const response = await client.post('/logentry/', entryData);
+        const response = await client.post('/create_log_entry/', data);
         return response.data;
     } catch (error) {
         console.error('Error creating log entry:', error);

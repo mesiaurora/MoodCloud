@@ -99,3 +99,20 @@ class DashboardView(APIView):
         # Placeholder for dashboard data aggregation logic
         data = self.fetch_data_for_user(request.user)
         return Response(data)
+    
+
+class CreateLogEntryView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        entry = MoodLogEntry.objects.create(user=request.user)
+        field_values = request.data.get('field_values', [])
+        for fv in field_values:
+            FieldValue.objects.create(
+                log_entry=entry,
+                field_id=fv['field_id'],
+                numeric_value=fv.get('numeric_value'),
+                boolean_value=fv.get('boolean_value'),
+                text_value=fv.get('text_value'),
+            )
+        return Response(MoodLogEntrySerializer(entry).data, status=status.HTTP_201_CREATED)

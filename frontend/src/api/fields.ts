@@ -27,6 +27,7 @@ export const getFields = async (): Promise<Field[]> => {
 export const createField = async (field: CreateFieldData): Promise<Field> => {
     try {
         const response = await client.post('/fields/', field);
+        console.log('Created field:', field.name);
         return response.data;
     } catch (error) {
         console.error('Error creating field:', error);
