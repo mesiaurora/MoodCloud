@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getFields, type Field } from "../api/fields";
 import { createLogEntry } from "../api/logentry";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function LogEntry() {
 
@@ -34,6 +34,17 @@ export default function LogEntry() {
       alert('Failed to save log entry. Please try again.');
     });  }
 
+  if (fields.length === 0) {
+  return (
+    <div className="min-h-screen bg-frost flex flex-col items-center pt-16 px-4">
+      <p className="text-plum text-2xl font-bold mb-8">Log an Entry</p>
+      <div className="bg-mint rounded-2xl shadow-lg p-6 w-full max-w-sm text-center">
+        <p className="text-plum mb-4">No fields yet.</p>
+        <Link to="/settings" className="text-teal font-medium hover:underline">Go to Settings to add some</Link>
+      </div>
+    </div>
+  );
+}
 
   return (<div className="min-h-screen bg-frost flex flex-col items-center pt-16 px-4">
     <p className="text-plum text-2xl font-bold mb-8">Log Entry</p>
