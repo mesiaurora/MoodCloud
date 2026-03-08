@@ -81,9 +81,8 @@ class DashboardView(APIView):
 
         streak = 0
         current_date = timezone.now().date()
-        for entry in moodlogentries:
-            entry_date = entry.logged_at.date()
-            if entry_date == current_date:
+        for date in logged_dates:
+            if date == current_date:
                 streak += 1
                 current_date -= timedelta(days=1)
             else:
