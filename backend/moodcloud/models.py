@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 class Field(models.Model):
     FIELD_TYPE_CHOICES = [
@@ -21,7 +22,7 @@ class Field(models.Model):
 class MoodLogEntry(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
-    logged_at = models.DateTimeField(auto_now_add=True)
+    logged_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return f"LogEntry {self.id} by {self.user}"

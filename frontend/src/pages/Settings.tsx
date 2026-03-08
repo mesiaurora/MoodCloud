@@ -37,14 +37,13 @@ export default function Settings() {
 
   const handleUpdateUsername = () => {
     auth.changeUsername(username).then(() => {
-      // Optionally show a success message or update UI
+      alert('Username changed successfully');
     });
   }
 
   const handlePasswordChange = () => {
     auth.changePassword(oldPassword, newPassword).then(() => {
-      // Optionally show a success message or update UI
-      alert('Password changed successfully');
+        alert('Password changed successfully');
     });
   }
 
@@ -116,7 +115,7 @@ export default function Settings() {
     <button onClick={handlePasswordChange} className="bg-plum text-lavender rounded-lg px-6 py-2 font-semibold hover:opacity-90 transition-opacity w-full mb-4">
       Change password
     </button>
-    <button onClick={handleDeleteAccount} className="bg-plum text-lavender rounded-lg px-6 py-2 font-semibold hover:opacity-90 transition-opacity w-full">
+    <button onClick={handleDeleteAccount} className="bg-red text-lavender rounded-lg px-6 py-2 font-semibold hover:opacity-90 transition-opacity w-full">
       Delete account
     </button>
   </div>
