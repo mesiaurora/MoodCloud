@@ -1,4 +1,4 @@
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Settings } from 'lucide-react';
 
@@ -7,6 +7,7 @@ export default function Layout() {
 const { isAuthenticated, logout } = useAuth();
 
 const { pathname } = useLocation();
+const navigate = useNavigate();
 
 
   return (
@@ -14,7 +15,7 @@ const { pathname } = useLocation();
     <nav className="bg-plum flex items-center justify-between px-6 py-3">  ¨
       {/* Left */}
       <div className="flex-1 flex justify-start">
-      <h1 className="text-lavender font-bold text-xl">MoodCloud</h1>
+      <h1 onClick={() => navigate('/')} className="text-lavender font-bold text-xl">MoodCloud</h1>
       </div>
 
      {/* Center */}

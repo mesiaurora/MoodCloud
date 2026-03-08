@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getLogEntries, type LogEntry } from "../api/logentry";
+import { deleteLogEntry, getLogEntries, type LogEntry } from "../api/logentry";
 
 export default function History() {
   const [entries, setEntries] = useState<LogEntry[]>([]);
@@ -7,6 +7,16 @@ export default function History() {
   useEffect(() => {
     getLogEntries().then(setEntries);
   }, []);
+
+  const handleDeleteEntry = (id: number) => {
+    if (window.confirm('Are you sure you want to delete this entry?')) {
+      deleteLogEntry(id).then(() => {
+        setEntries(entries.filter(e => e.id !== id));
+      }).catch(() => {
+        alert('Failed to delete log entry. Please try again.');
+      });
+    }
+  };
 
   return (<div className="min-h-screen bg-frost flex flex-col items-center pt-16 px-4">
     <p className="text-plum text-2xl font-bold mb-8">History</p>
@@ -28,6 +38,11 @@ export default function History() {
                 </p>
               </div>
             ))}
+           <div className="flex justify-end mt-2">
+              <button onClick={() => handleDeleteEntry(entry.id)} className="bg-red text-white rounded-lg px-3 py-1 text-sm font-semibold hover:opacity-90">
+                Delete
+              </button>
+            </div>
           </div>
         ))}
       </div>
