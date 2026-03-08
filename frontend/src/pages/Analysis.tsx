@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { getAnalysis, type BooleanResult, type FieldAnalysis, type NumericResult, type TextResult } from "../api/analysis";
 
 export default function Analysis() {
@@ -9,8 +9,6 @@ export default function Analysis() {
   const today = new Date().toISOString().split('T')[0];
   const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
   const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-
-  // TODO: buttons to analyse week, analyse month, analyse custom range (show date pickers when clicking this one)
 
   const handleDataAnalysis = (startDate?: string, endDate?: string) => {
     getAnalysis(startDate || '', endDate || '').then(response => {
