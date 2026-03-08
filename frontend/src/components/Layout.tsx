@@ -15,7 +15,8 @@ const navigate = useNavigate();
     <nav className="bg-plum flex items-center justify-between px-6 py-3">  ¨
       {/* Left */}
       <div className="flex-1 flex justify-start">
-      <h1 onClick={() => navigate('/')} className="text-lavender font-bold text-xl">MoodCloud</h1>
+        <h1 onClick={() => navigate('/')} className="text-lavender font-bold text-xl cursor-pointer">MoodCloud</h1>
+        <span className="text-lavender text-sm ml-2">Hello {user?.username}!</span>
       </div>
 
      {/* Center */}
@@ -35,7 +36,6 @@ const navigate = useNavigate();
       <div className="flex-1 flex justify-end items-center gap-2">
         {isAuthenticated && (
           <div className="flex items-center gap-2">
-            {/* <span className="text-lavender text-sm">{user?.username}</span> */}
             <Link to="/settings"><Settings size={20} className="text-lavender hover:text-frost" /></Link>
             <button onClick={logout} className="bg-darklavender text-mist rounded-lg px-3 py-1 text-sm font-medium hover:opacity-90">Logout</button>
           </div>)}
