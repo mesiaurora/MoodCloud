@@ -4,7 +4,7 @@ import { Settings } from 'lucide-react';
 
 export default function Layout() {
   
-const { isAuthenticated, logout } = useAuth();
+const { isAuthenticated, logout, user } = useAuth();
 
 const { pathname } = useLocation();
 const navigate = useNavigate();
@@ -33,14 +33,9 @@ const navigate = useNavigate();
 
       {/* Right */}
       <div className="flex-1 flex justify-end items-center gap-2">
-        {!isAuthenticated && (
-          <div className="flex gap-3">
-            <Link to="/login" className="bg-darklavender text-mist rounded-lg px-3 py-1 text-sm font-medium hover:opacity-90">Login</Link>
-            <Link to="/register" className="bg-darklavender text-mist rounded-lg px-3 py-1 text-sm font-medium hover:opacity-90">Register</Link>
-          </div>
-        )}
         {isAuthenticated && (
           <div className="flex items-center gap-2">
+            {/* <span className="text-lavender text-sm">{user?.username}</span> */}
             <Link to="/settings"><Settings size={20} className="text-lavender hover:text-frost" /></Link>
             <button onClick={logout} className="bg-darklavender text-mist rounded-lg px-3 py-1 text-sm font-medium hover:opacity-90">Logout</button>
           </div>)}

@@ -20,6 +20,10 @@ export default function Login() {
   <div className="bg-lavender rounded-2xl shadow-lg p-8 w-full max-w-sm flex flex-col gap-4">
     <h1 className="text-2xl font-bold text-plum text-center">MoodCloud Login</h1>
     <p className="text-plum text-center text-sm">Login to your MoodCloud account</p>
+    <div>
+      <p className="text-plum text-center text-sm">No account? </p>
+      <button onClick={() => navigate("/register")} className="text-teal hover:underline">Register here</button>
+    </div>
 
     <div className="flex flex-col gap-1">
       <label className="text-plum text-sm font-medium" htmlFor="username">Username</label>
