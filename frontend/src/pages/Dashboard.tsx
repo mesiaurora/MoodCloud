@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { getDashboardData, type DashboardData } from "../api/dashboard";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
 
   const [data, setData] = useState<DashboardData | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     getDashboardData().then(setData);
@@ -23,7 +25,7 @@ export default function Dashboard() {
   {/* Log entry card */}
   <div className="bg-mint rounded-2xl shadow-lg p-6 flex flex-col items-center mb-4 w-full max-w-sm">
     <p className="text-plum font-medium mb-4">Ready to log?</p>
-    <button className="bg-plum text-lavender rounded-lg px-6 py-2 font-semibold hover:opacity-90 transition-opacity w-full">
+    <button onClick={() => navigate('/logentry')} className="bg-plum text-lavender rounded-lg px-6 py-2 font-semibold hover:opacity-90 transition-opacity w-full">
       Log an Entry
     </button>
   </div>
@@ -31,14 +33,7 @@ export default function Dashboard() {
   {/* Analysis card */}
   <div className="bg-mint rounded-2xl shadow-lg p-6 flex flex-col items-center w-full max-w-sm">
     <p className="text-plum font-medium mb-4">Analyse your data</p>
-    {data.has_entries_last_7_days 
-      ? <button className="bg-plum text-lavender rounded-lg px-6 py-2 font-semibold hover:opacity-90 transition-opacity w-full mb-2">Analyse this week</button>
-      : <p className="text-plum text-sm text-center">No entries this week yet.</p>
-    }
-    {data.has_entries_last_30_days 
-      ? <button className="bg-plum text-lavender rounded-lg px-6 py-2 font-semibold hover:opacity-90 transition-opacity w-full mt-2">Analyse this month</button>
-      : <p className="text-plum text-sm text-center">No entries this month yet.</p>
-    }
+  <button onClick={() => navigate('/analysis')} className="bg-plum text-lavender rounded-lg px-6 py-2 font-semibold hover:opacity-90 transition-opacity w-full mt-2">Analyse your data</button>
   </div>
 
 </div>)

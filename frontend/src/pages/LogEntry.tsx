@@ -1,14 +1,39 @@
 import { useEffect, useState } from "react";
 import { getFields, type Field } from "../api/fields";
+import { createLogEntry } from "../api/logentry";
+import { useNavigate } from "react-router-dom";
 
 export default function LogEntry() {
 
   const [fields, setFields] = useState<Field[]>([]);
   const [values, setValues] = useState<Record<number, string | number | boolean>>({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     getFields().then(setFields);
   }, []);
+
+  const handleSaveEntry = () => {
+    createLogEntry({ field_values: Object.entries(values).map(([field_id, value]) => {
+      const field = fields.find(f => f.id === Number(field_id));
+      if (!field) return null;
+
+      const fieldValue: any = { field_id: Number(field_id) };
+      if (field.field_type === 'numeric') {
+        fieldValue.numeric_value = value as number;
+      } else if (field.field_type === 'boolean') {
+        fieldValue.boolean_value = value as boolean;
+      } else if (field.field_type === 'text') {
+        fieldValue.text_value = value as string;
+      }
+      return fieldValue;
+    }).filter(v => v !== null) }).then(() => {
+      navigate('/');
+      setValues({});
+    }).catch(() => {
+      alert('Failed to save log entry. Please try again.');
+    });  }
+
 
   return (<div className="min-h-screen bg-frost flex flex-col items-center pt-16 px-4">
     <p className="text-plum text-2xl font-bold mb-8">Log Entry</p>
@@ -46,7 +71,7 @@ export default function LogEntry() {
             )}
           </div>
         ))}
-        <button className="bg-plum text-lavender rounded-lg py-2 font-semibold hover:opacity-90 transition-opacity w-full">
+        <button onClick={handleSaveEntry} className="bg-plum text-lavender rounded-lg py-2 font-semibold hover:opacity-90 transition-opacity w-full">
           Save Entry
         </button>
       </div>
