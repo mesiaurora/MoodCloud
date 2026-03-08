@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from moodcloud.views import AnalysisView, CreateLogEntryView, DashboardView, MeView, RegisterView
+from moodcloud.views import AnalysisView, ChangePasswordView, CreateLogEntryView, DashboardView, MeView, RegisterView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
@@ -29,4 +29,5 @@ urlpatterns = [
     path('api/dashboard/', DashboardView.as_view(), name='dashboard'),
     path('api/create_log_entry/', CreateLogEntryView.as_view(), name='create_log_entry'),
     path('api/analysis/', AnalysisView.as_view(), name='analysis'),
+    path('api/change-password/', ChangePasswordView.as_view(), name='change_password'),
 ]

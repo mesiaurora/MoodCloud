@@ -157,3 +157,18 @@ class CreateLogEntryView(APIView):
                 text_value=fv.get('text_value'),
             )
         return Response(MoodLogEntrySerializer(entry).data, status=status.HTTP_201_CREATED)
+    
+class ChangePasswordView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        old_password = request.data.get('old_password')
+        new_password = request.data.get('new_password')
+
+        if not user.check_password(old_password):
+            return Response({'error': 'Old password is incorrect'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(new_password)
+        user.save()
+        return Response({'message': 'Password changed successfully'})

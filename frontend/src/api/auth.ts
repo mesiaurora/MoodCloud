@@ -34,6 +34,18 @@ export const auth = {
         return response.data;
     },
 
+    async changePassword(old_password: string, new_password: string): Promise<void> {
+        await client.post('/change-password/', { old_password, new_password });
+    },
+
+    async changeUsername(username: string): Promise<void> {
+        await client.patch('/me/', { username });
+    },
+
+    async deleteAccount(): Promise<void> {
+        await client.delete('/me/');
+    },
+
     logout(): void {
         localStorage.removeItem(TOKEN_KEY);
         localStorage.removeItem('jwt_refresh');
@@ -54,4 +66,5 @@ export const auth = {
     clearToken(): void {
         localStorage.removeItem(TOKEN_KEY);
     },
+    
 };

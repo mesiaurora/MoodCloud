@@ -1,11 +1,20 @@
 import { useEffect, useState } from "react"
 import { getFields, createField, deleteField, type Field } from "../api/fields";
+import { auth } from "../api/auth";
+import { Navigate, useNavigate } from "react-router-dom";
 
 export default function Settings() {
 
   const [fields, setFields] = useState<Field[]>([]);
   const [fieldType, setFieldType] = useState<'numeric' | 'boolean' | 'text'>('numeric');
   const [newFieldName, setNewFieldName] = useState('');
+  const [username, setUsername] = useState('');
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [showUsernameChange, setShowUsernameChange] = useState(false);
+  
+  const navigate = useNavigate();
 
   useEffect(() => {
     getFields().then(setFields);
@@ -24,6 +33,28 @@ export default function Settings() {
     deleteField(fieldId).then(() => {
       setFields(prev => prev.filter(f => f.id !== fieldId));
     });
+  }
+
+  const handleUpdateUsername = () => {
+    auth.changeUsername(username).then(() => {
+      // Optionally show a success message or update UI
+    });
+  }
+
+  const handlePasswordChange = () => {
+    auth.changePassword(oldPassword, newPassword).then(() => {
+      // Optionally show a success message or update UI
+      alert('Password changed successfully');
+    });
+  }
+
+  const handleDeleteAccount = () => {
+    if(window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+      auth.deleteAccount().then(() => {
+        auth.logout();
+        navigate('/login');
+      });
+    }
   }
 
   return (<div className="min-h-screen bg-frost flex flex-col items-center pt-16 px-4">
@@ -68,13 +99,24 @@ export default function Settings() {
   {/* Account settings */}
   <div className="bg-mint rounded-2xl shadow-lg p-6 flex flex-col items-center mb-4 w-full max-w-sm">
     <p className="text-plum font-medium mb-6">Account settings</p>
-    <button className="bg-plum text-lavender rounded-lg px-6 py-2 font-semibold hover:opacity-90 transition-opacity w-full mb-4">
+    <input type="text" placeholder="New username" value={username} onChange={(e) => setUsername(e.target.value)}
+      className="bg-mist border border-steel rounded-lg p-2 text-plum outline-none focus:ring-2 focus:ring-teal w-full mb-4" />
+    <button onClick={handleUpdateUsername} className="bg-plum text-lavender rounded-lg px-6 py-2 font-semibold hover:opacity-90 transition-opacity w-full mb-4">
       Update username
     </button>
-    <button className="bg-plum text-lavender rounded-lg px-6 py-2 font-semibold hover:opacity-90 transition-opacity w-full mb-4">
+    <input type="password" placeholder="Old Password" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)}
+      className="bg-mist border border-steel rounded-lg p-2 text-plum outline-none focus:ring-2 focus:ring-teal w-full mb-4" />
+    <input
+      type="password"
+      placeholder="New password"
+      value={newPassword}
+      onChange={(e) => setNewPassword(e.target.value)}
+      className="bg-mist border border-steel rounded-lg p-2 text-plum outline-none focus:ring-2 focus:ring-teal w-full mb-4"
+    />
+    <button onClick={handlePasswordChange} className="bg-plum text-lavender rounded-lg px-6 py-2 font-semibold hover:opacity-90 transition-opacity w-full mb-4">
       Change password
     </button>
-    <button className="bg-plum text-lavender rounded-lg px-6 py-2 font-semibold hover:opacity-90 transition-opacity w-full">
+    <button onClick={handleDeleteAccount} className="bg-plum text-lavender rounded-lg px-6 py-2 font-semibold hover:opacity-90 transition-opacity w-full">
       Delete account
     </button>
   </div>
