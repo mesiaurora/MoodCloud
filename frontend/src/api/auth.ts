@@ -34,8 +34,8 @@ export const auth = {
         return response.data;
     },
 
-    async changePassword(old_password: string, new_password: string): Promise<void> {
-        await client.post('/change-password/', { old_password, new_password });
+    async changePassword(old_password: string, new_password: string, new_password_confirm: string): Promise<void> {
+        await client.post('/change-password/', { old_password, new_password, new_password_confirm });
     },
 
     async changeUsername(username: string): Promise<void> {

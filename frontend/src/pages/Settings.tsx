@@ -11,6 +11,7 @@ export default function Settings() {
   const [username, setUsername] = useState('');
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
   const [showPasswordChange, setShowPasswordChange] = useState(false);
   const [showUsernameChange, setShowUsernameChange] = useState(false);
   
@@ -42,7 +43,7 @@ export default function Settings() {
   }
 
   const handlePasswordChange = () => {
-    auth.changePassword(oldPassword, newPassword).then(() => {
+    auth.changePassword(oldPassword, newPassword, newPasswordConfirm).then(() => {
         alert('Password changed successfully');
     });
   }
@@ -110,6 +111,13 @@ export default function Settings() {
       placeholder="New password"
       value={newPassword}
       onChange={(e) => setNewPassword(e.target.value)}
+      className="bg-mist border border-steel rounded-lg p-2 text-plum outline-none focus:ring-2 focus:ring-teal w-full mb-4"
+    />
+    <input
+      type="password"
+      placeholder="Confirm new password"
+      value={newPasswordConfirm}
+      onChange={(e) => setNewPasswordConfirm(e.target.value)}
       className="bg-mist border border-steel rounded-lg p-2 text-plum outline-none focus:ring-2 focus:ring-teal w-full mb-4"
     />
     <button onClick={handlePasswordChange} className="bg-plum text-lavender rounded-lg px-6 py-2 font-semibold hover:opacity-90 transition-opacity w-full mb-4">
