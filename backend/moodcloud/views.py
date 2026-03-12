@@ -79,8 +79,14 @@ class DashboardView(APIView):
             entry.logged_at.date() for entry in moodlogentries
         ), reverse=True)
 
+        #calculate streak of consecutive days with entries
         streak = 0
         current_date = timezone.now().date()
+
+        # If user hasn't logged today yet, check yesterday and calculate streak from yesterday
+        if current_date not in logged_dates:
+            current_date = current_date - timedelta(days=1)
+
         for date in logged_dates:
             if date == current_date:
                 streak += 1
@@ -98,7 +104,6 @@ class DashboardView(APIView):
         }
 
     def get(self, request):
-        # Placeholder for dashboard data aggregation logic
         data = self.fetch_data_for_user(request.user)
         return Response(data)
 

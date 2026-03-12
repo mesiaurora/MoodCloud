@@ -47,7 +47,7 @@ class RegisterViewTests(TestCase):
         response = self.client.post(self.register_url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-class AnalysisTests(TestCase):
+class AnalysisViewTests(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', password='testpass123')
@@ -120,4 +120,62 @@ class AnalysisTests(TestCase):
         self.assertEqual(word_counts.get('sad', 0), 1)
         self.assertEqual(word_counts.get('neutral', 0), 1)
 
+class DashboardViewTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(username='testuser', password='testpass123')
+        self.client.force_authenticate(user=self.user)
 
+        self.number_field = Field.objects.create(user=self.user, name='Sleep (hours)', field_type='numeric')
+        self.text_field = Field.objects.create(user=self.user, name='Mood', field_type='text')
+        self.boolean_field = Field.objects.create(user=self.user, name='Nosebleed', field_type='boolean')
+
+        self.log_entry = MoodLogEntry.objects.create(user=self.user, logged_at=timezone.now() - timedelta(days=6))
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.number_field, numeric_value='8')
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.text_field, text_value='Okay')
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.boolean_field, boolean_value=True)
+
+        self.log_entry = MoodLogEntry.objects.create(user=self.user, logged_at=timezone.now() - timedelta(days=5))
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.number_field, numeric_value='7')
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.text_field, text_value='Farty')
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.boolean_field, boolean_value=False)
+
+        self.log_entry = MoodLogEntry.objects.create(user=self.user, logged_at=timezone.now() - timedelta(days=4))
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.number_field, numeric_value='7')
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.text_field, text_value='Good')
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.boolean_field, boolean_value=False)
+
+        self.log_entry = MoodLogEntry.objects.create(user=self.user, logged_at=timezone.now() - timedelta(days=3))
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.number_field, numeric_value='5')
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.text_field, text_value='Sad')
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.boolean_field, boolean_value=False)
+
+        self.log_entry = MoodLogEntry.objects.create(user=self.user, logged_at=timezone.now() - timedelta(days=2))
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.text_field, text_value='Happy')
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.number_field, numeric_value='9')
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.boolean_field, boolean_value=True)
+
+        self.log_entry = MoodLogEntry.objects.create(user=self.user, logged_at=timezone.now() - timedelta(days=1))
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.boolean_field, boolean_value=True)
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.number_field, numeric_value='3')
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.text_field, text_value='Neutral')
+
+        self.log_entry = MoodLogEntry.objects.create(user=self.user, logged_at=timezone.now())
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.number_field, numeric_value='4')
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.text_field, text_value='Happy')
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.boolean_field, boolean_value=False)
+
+    def test_dashboard_endpoint_returns_200(self):
+        """Test that dashboard endpoint returns 200."""
+        response = self.client.get('/api/dashboard/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_dashboard_streak_calculation(self):
+        """Test that dashboard calculates streak correctly."""
+        response = self.client.get('/api/dashboard/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.data
+        self.assertEqual(data['streak'], 7)
+        self.assertTrue(data['has_entries_last_7_days'])
+        self.assertTrue(data['has_entries_last_30_days'])
+    
