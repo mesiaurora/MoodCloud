@@ -17,6 +17,10 @@ client.interceptors.response.use(
     response => response,
     async error => {
         if (error.response?.status === 401) {
+            if (error.config.url?.includes('/token/')) {
+                return Promise.reject(error);
+            }
+
             const refresh = localStorage.getItem('jwt_refresh');
             if (refresh) {
                 try {
