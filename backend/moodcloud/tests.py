@@ -228,3 +228,35 @@ class MeViewTests(TestCase):
         response = self.client.delete('/api/me/')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(User.objects.filter(username='testuser').exists())
+
+class ChangePasswordViewTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(username='testuser', password='testpass123')
+        self.client.force_authenticate(user=self.user)
+
+    def test_change_password_success(self):
+        response = self.client.post('/api/change-password/', {
+            'old_password': 'testpass123',
+            'new_password': 'newpass456',
+            'new_password_confirm': 'newpass456'
+        }, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password('newpass456'))
+
+    def test_change_password_wrong_old_password(self):
+        response = self.client.post('/api/change-password/', {
+            'old_password': 'wrongpass',
+            'new_password': 'newpass456',
+            'new_password_confirm': 'newpass456'
+        }, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_change_password_mismatched_new_passwords(self):
+        response = self.client.post('/api/change-password/', {
+            'old_password': 'testpass123',
+            'new_password': 'newpass456',
+            'new_password_confirm': 'differentpass'
+        }, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
