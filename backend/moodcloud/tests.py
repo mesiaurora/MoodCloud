@@ -178,4 +178,53 @@ class DashboardViewTests(TestCase):
         self.assertEqual(data['streak'], 7)
         self.assertTrue(data['has_entries_last_7_days'])
         self.assertTrue(data['has_entries_last_30_days'])
-    
+
+class CreateLogEntryViewTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(username='testuser', password='testpass123')
+        self.client.force_authenticate(user=self.user)
+        self.field = Field.objects.create(user=self.user, name='Mood', field_type='text')
+
+    def test_create_log_entry_returns_201(self):
+        """Test that creating a log entry returns 201."""
+        response = self.client.post('/api/create_log_entry/', data={
+            'field_values': [
+                {'field_id': self.field.id, 'text_value': 'Happy'}
+            ]
+        }, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(MoodLogEntry.objects.filter(user=self.user).exists())
+
+    def test_create_log_entry_saves_field_values(self):
+        self.client.post('/api/create_log_entry/', data={
+            'field_values': [
+                {'field_id': self.field.id, 'text_value': 'Happy'}
+            ]
+        }, format='json')
+        entry = MoodLogEntry.objects.get(user=self.user)
+        self.assertEqual(entry.field_values.count(), 1)
+        self.assertEqual(entry.field_values.first().text_value, 'Happy')
+
+class MeViewTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(username='testuser', password='testpass123')
+        self.client.force_authenticate(user=self.user)
+
+    def test_me_endpoint_returns_200_and_user_info(self):
+        """Test that /api/me/ returns 200 and user info."""
+        response = self.client.get('/api/me/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['username'], 'testuser')
+
+    def test_update_username(self):
+        response = self.client.patch('/api/me/', {'username': 'newname'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.username, 'newname')
+
+    def test_delete_account(self):
+        response = self.client.delete('/api/me/')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(User.objects.filter(username='testuser').exists())
