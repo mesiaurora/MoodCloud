@@ -1,3 +1,123 @@
-from django.test import TestCase
+from dataclasses import Field
+from datetime import timedelta
+import random
 
-# Create your tests here.
+from django.test import TestCase
+from django.contrib.auth.models import User
+from django.utils import timezone
+from rest_framework import status
+from rest_framework.test import APIClient
+from moodcloud.models import Field, MoodLogEntry, FieldValue
+from datetime import date, timedelta
+
+class RegisterViewTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.register_url = '/api/register/'
+
+    def test_valid_registration_returns_201_and_tokens(self):
+        """Test that valid registration returns 201 with tokens."""
+        data = {
+            'username': 'testuser',
+            'password': 'testpass123',
+            'password2': 'testpass123'
+        }
+        response = self.client.post(self.register_url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIn('access', response.data)
+        self.assertIn('refresh', response.data)
+
+    def test_duplicate_username_returns_400(self):
+        """Test that duplicate username returns 400."""
+        User.objects.create_user(username='testuser', password='testpass123')
+        data = {
+            'username': 'testuser',
+            'password': 'testpass123',
+            'password2': 'testpass123'
+        }
+        response = self.client.post(self.register_url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_missing_password_returns_400(self):
+        """Test that missing password returns 400."""
+        data = {
+            'username': 'testuser',
+            'password2': 'testpass123'
+        }
+        response = self.client.post(self.register_url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+class AnalysisTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(username='testuser', password='testpass123')
+        self.client.force_authenticate(user=self.user)
+
+        self.number_field = Field.objects.create(user=self.user, name='Sleep (hours)', field_type='numeric')
+        self.log_entry = MoodLogEntry.objects.create(user=self.user, logged_at=timezone.now())
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.number_field, numeric_value='5')
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.number_field, numeric_value='9')
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.number_field, numeric_value='3')
+
+        self.text_field = Field.objects.create(user=self.user, name='Mood', field_type='text')
+        self.log_entry = MoodLogEntry.objects.create(user=self.user, logged_at=timezone.now())
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.text_field, text_value='Happy')
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.text_field, text_value='Sad')
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.text_field, text_value='Neutral')
+
+        self.boolean_field = Field.objects.create(user=self.user, name='Nosebleed', field_type='boolean')
+        self.log_entry = MoodLogEntry.objects.create(user=self.user, logged_at=timezone.now())
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.boolean_field, boolean_value=True)
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.boolean_field, boolean_value=False)
+        FieldValue.objects.create(log_entry=self.log_entry, field=self.boolean_field, boolean_value=True)
+
+
+    def test_analysis_endpoint_returns_200(self):
+        """Test that analysis endpoint returns 200."""
+        today = date.today().isoformat()
+        month_ago = (date.today() - timedelta(days=30)).isoformat()
+        response = self.client.get(f'/api/analysis/?start_date={month_ago}&end_date={today}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_numeric_analysis(self):
+        """Test that numeric analysis returns mean and median."""
+        today = date.today().isoformat()
+        month_ago = (date.today() - timedelta(days=30)).isoformat()
+        response = self.client.get(f'/api/analysis/?start_date={month_ago}&end_date={today}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        analysis = response.data['analysis']
+        numeric_result = next((a for a in analysis if a['field'] == 'Sleep (hours)'), None)
+        self.assertIsNotNone(numeric_result)
+        self.assertEqual(numeric_result['type'], 'numeric')
+        self.assertAlmostEqual(numeric_result['mean'], 5.67, places=2)
+        self.assertEqual(numeric_result['median'], 5)
+
+    def test_boolean_analysis(self):
+        """Test that boolean analysis returns true and false counts."""
+        today = date.today().isoformat()
+        month_ago = (date.today() - timedelta(days=30)).isoformat()
+        response = self.client.get(f'/api/analysis/?start_date={month_ago}&end_date={today}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        analysis = response.data['analysis']
+        boolean_result = next((a for a in analysis if a['field'] == 'Nosebleed'), None)
+        self.assertIsNotNone(boolean_result)
+        self.assertEqual(boolean_result['type'], 'boolean')
+        self.assertEqual(boolean_result['true_count'], 2)
+        self.assertEqual(boolean_result['false_count'], 1)
+
+    def test_text_analysis(self):
+        """Test that text analysis returns word counts."""
+        today = date.today().isoformat()
+        month_ago = (date.today() - timedelta(days=30)).isoformat()
+        response = self.client.get(f'/api/analysis/?start_date={month_ago}&end_date={today}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        analysis = response.data['analysis']
+        text_result = next((a for a in analysis if a['field'] == 'Mood'), None)
+        self.assertIsNotNone(text_result)
+        self.assertEqual(text_result['type'], 'text')
+        word_counts = {wc['word']: wc['count'] for wc in text_result['word_counts']}
+        self.assertEqual(word_counts.get('happy', 0), 1)
+        self.assertEqual(word_counts.get('sad', 0), 1)
+        self.assertEqual(word_counts.get('neutral', 0), 1)
+
+
