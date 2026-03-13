@@ -3,7 +3,7 @@ import client from '../api/client';
 export interface DashboardData {
     streak: number;
     has_entries_last_7_days: boolean;
-    has_entries_last_30_days: boolean;
+    entries_last_30_days: string[];
 }
 
 

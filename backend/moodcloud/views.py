@@ -95,12 +95,11 @@ class DashboardView(APIView):
                 break
         
         has_entries_last_7_days = moodlogentries.filter(logged_at__gte=timezone.now() - timedelta(days=7)).exists()
-        has_entries_last_30_days = moodlogentries.exists()
         
         return {
             'streak': streak,
             'has_entries_last_7_days': has_entries_last_7_days,
-            'has_entries_last_30_days': has_entries_last_30_days,
+            'entries_last_30_days': [d.isoformat() for d in logged_dates],
         }
 
     def get(self, request):
