@@ -2,6 +2,7 @@
 
 MoodCloud is a personal mood and wellness tracker that lets you define your own tracking fields and analyse the data over time.
 Stack: Django + Django REST Framework + React + TypeScript + Tailwind CSS.
+Mobile is WIP: React Native + Expo
 
 ---
 
@@ -44,6 +45,12 @@ npm run dev
 
 Frontend runs at `http://localhost:5173`, backend at `http://localhost:8000`.
 
+### Mobile
+```bash
+cd mobile/moodcloud-mobile
+npx expo start
+```
+
 ---
 
 ## Demo data
@@ -68,7 +75,7 @@ This creates a user with credentials:
 - View history and delete entries
 - Analyse data by week, month, or custom date range
 - Word cloud for text fields, split bar for boolean fields, median/mean for numeric fields
-- Streak tracking
+- Streak tracking and month view how many days you've logged in the current month
 
 ---
 
