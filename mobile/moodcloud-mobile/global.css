@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@theme {
+    --color-teal: #557F84;
+    --color-lightteal: #77a3aa;
+    --color-steel: #B4BEC2;
+    --color-lightsteel: #d1d9db;
+    --color-plum: #583366;
+    --color-lightplum: #9f7eaa;
+    --color-lavender: #f1e8ff;
+    --color-darklavender: #4d2c59;
+    --color-mist: #eee9f5;
+    --color-frost: #e7eff9;
+    --color-mint: #b1ccc7;
+    --color-red: #683440;
+}
