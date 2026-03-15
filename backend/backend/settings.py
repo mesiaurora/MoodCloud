@@ -123,7 +123,10 @@ STATIC_URL = 'static/'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "http://localhost:8081",
 ]
+
+ALLOWED_HOSTS = ['192.168.68.100', 'localhost', '127.0.0.1']
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

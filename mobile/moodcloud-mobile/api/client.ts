@@ -1,14 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { router } from 'expo-router';
-import { auth } from './auth';
 
 const client = axios.create({
-    baseURL: 'http://172.23.168.187:8000/api',
+    baseURL: 'http://192.168.68.100:8000/api',
 });
 
 client.interceptors.request.use(async (config) => {
-    const token = await auth.getToken();
+    const token = await AsyncStorage.getItem('jwt_token');
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
@@ -25,16 +24,18 @@ client.interceptors.response.use(
             const refresh = await AsyncStorage.getItem('jwt_refresh');
             if (refresh) {
                 try {
-                    const response = await axios.post('http://YOUR_LOCAL_IP:8000/api/token/refresh/', { refresh });
-                    await auth.setToken(response.data.access);
+                    const response = await axios.post('http://192.168.68.100:8000/api/token/refresh/', { refresh });
+                    await AsyncStorage.setItem('jwt_token', response.data.access);
                     error.config.headers.Authorization = `Bearer ${response.data.access}`;
                     return client(error.config);
                 } catch {
-                    await auth.logout();
+                    await AsyncStorage.removeItem('jwt_token');
+                    await AsyncStorage.removeItem('jwt_refresh');
                     router.replace('/(auth)/login');
                 }
             } else {
-                await auth.logout();
+                await AsyncStorage.removeItem('jwt_token');
+                await AsyncStorage.removeItem('jwt_refresh');
                 router.replace('/(auth)/login');
             }
         }

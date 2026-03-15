@@ -1,9 +1,7 @@
-import { Text, View } from "react-native";
+import { useAuth } from "@/context/AuthContext";
+import { Redirect } from "expo-router";
 
 export default function Index() {
-  return (
-    <View>
-      <Text>MoodCloud</Text>
-    </View>
-  );
+  const { isAuthenticated } = useAuth();
+  return <Redirect href={isAuthenticated ? "/(app)/dashboard" : "/(auth)/login"} />;
 }
