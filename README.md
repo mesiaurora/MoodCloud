@@ -45,12 +45,6 @@ npm run dev
 
 Frontend runs at `http://localhost:5173`, backend at `http://localhost:8000`.
 
-### Mobile
-```bash
-cd mobile/moodcloud-mobile
-npx expo start
-```
-
 ---
 
 ## Demo data
