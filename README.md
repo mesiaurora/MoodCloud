@@ -28,6 +28,8 @@ pip install -r requirements.txt
 Create a `.env` file in the `backend/` directory:
 ```
 SECRET_KEY=your-secret-key-here
+ALLOWED_HOSTS=localhost,127.0.0.1
+DEBUG=True
 ```
 
 Run migrations and start the server:
