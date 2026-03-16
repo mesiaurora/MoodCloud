@@ -83,3 +83,4 @@ This creates a user with credentials:
 
 - Database is SQLite, included in `.gitignore` — run migrations and demo data command on first setup
 - JWT authentication with automatic token refresh
+- Note: On some Linux systems, use `python3` and `pip3` instead of `python` and `pip`.
